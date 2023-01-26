@@ -201,7 +201,6 @@ Tilemap.prototype.zoomOut = function(){
   this.mouseoverGraphics.clear();
 
   this.zoom = Math.max(this.zoom / 2, 1);
-  console.log(this.zoom);
   this.scale.x = this.scale.y = this.zoom;
 
   this.centerOnSelectedTile();
