@@ -8,8 +8,13 @@ function mouse_down(evt, this_ptr) {
     this_ptr.mousePressPoint[0] = evt.client.x - this_ptr.position.x;
     this_ptr.mousePressPoint[1] = evt.client.y - this_ptr.position.y;
 
-    this_ptr.selectTile(Math.floor(this_ptr.mousePressPoint[0] / (this_ptr.tileSize * this_ptr.zoom)),
-               Math.floor(this_ptr.mousePressPoint[1] / (this_ptr.tileSize * this_ptr.zoom)));
+    var selX = Math.floor(this_ptr.mousePressPoint[0] / (this_ptr.tileSize * this_ptr.zoom));
+    var selY = Math.floor(this_ptr.mousePressPoint[1] / (this_ptr.tileSize * this_ptr.zoom));
+
+    //a fix for small zoomlevel 1,2
+    if (this_ptr.zoom <= 2 && selY > 0) selY -= 1;
+
+    this_ptr.selectTile(selX, selY);
   }
 }
 
@@ -32,8 +37,12 @@ function mouse_move(evt, this_ptr) {
     mouseOverPoint[0] = evt.client.x - this_ptr.position.x;
     mouseOverPoint[1] = evt.client.y - this_ptr.position.y;
 
-    var mouseoverTileCoords = [Math.floor(mouseOverPoint[0] / (this_ptr.tileSize * this_ptr.zoom)),
-                          Math.floor(mouseOverPoint[1] / (this_ptr.tileSize * this_ptr.zoom))];
+    var selX = Math.floor(mouseOverPoint[0] / (this_ptr.tileSize * this_ptr.zoom));
+    var selY = Math.floor(mouseOverPoint[1] / (this_ptr.tileSize * this_ptr.zoom));
+    //a fix for small zoomlevel 1,2
+    if (this_ptr.zoom <= 2 && selY > 0) selY -= 1;
+
+    var mouseoverTileCoords = [selX, selY];
     this_ptr.mouseoverGraphics.clear();
     this_ptr.mouseoverGraphics.lineStyle(1, 0xFFFFFF, 1);
     this_ptr.mouseoverGraphics.beginFill(0x000000, 0);
@@ -125,8 +134,8 @@ Tilemap.prototype.generateMap = function(){
   }
 
   // spawn some landmasses
-  for(var j=0; j<25; j++){ // number of landmasses
-    for(var i=0; i<12; i++){ // size seed of landmasses
+  for(var j=0; j<10; j++){ //25 number of landmasses
+    for(var i=0; i<9; i++){ //12 size seed of landmasses
       this.spawnLandmass(Math.floor(i / 2) + 1,
                          Math.floor(Math.random()*this.tilesWidth),
                          Math.floor(Math.random()*this.tilesHeight));
@@ -192,6 +201,7 @@ Tilemap.prototype.zoomOut = function(){
   this.mouseoverGraphics.clear();
 
   this.zoom = Math.max(this.zoom / 2, 1);
+  console.log(this.zoom);
   this.scale.x = this.scale.y = this.zoom;
 
   this.centerOnSelectedTile();
